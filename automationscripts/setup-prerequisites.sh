@@ -17,6 +17,7 @@ az role assignment create --assignee $APP_ID --role 'Contributor'
 # Assign built-in User Access Administrator RBAC role since granting RBAC access to other resources during the cluster creation will be required at subscription level (e.g. AKS-managed Internal Load Balancer, ACR, Managed Identities, etc.)
 az role assignment create --assignee $APP_ID --role 'User Access Administrator'
 
+echo "Completed assigning the necessary permissions to the SP"
 
 # Step 1.2
 # Register the preview features for the target subscription
@@ -31,10 +32,14 @@ az feature list -o table --query "[?name=='Microsoft.ContainerService/AKS-AzureK
 # When all say "Registered" then re-register the AKS resource provider (To-Do- check for a subscription that does not have the features registered)
 az provider register --namespace Microsoft.ContainerService
 
+echo "Completed registering the necessary features"
+
 # Step 2
 # Create the TLS Certificates needed for the deployment of App-Gw and Traefik Ingress Controller
 
 # execute the following commands from the context of the root folder
+echo "Creating the TLS certificates"
+
 cd ..
 echo $(pwd)
 export DOMAIN_NAME_AKS_BASELINE="contoso.com"
@@ -48,8 +53,13 @@ openssl req -x509 -nodes -days 365 -newkey rsa:2048 -out traefik-ingress-interna
 
 export AKS_INGRESS_CONTROLLER_CERTIFICATE_BASE64_AKS_BASELINE=$(cat traefik-ingress-internal-aks-ingress-tls.crt | base64 | tr -d '\n')
 
+echo "Completed Creating & Exporting the TLS certificates"
+
+
 # Step 3
 # This step is supposed to take care of the integration of the AKS with Azure AD
+
+echo "Assigning members to the AAD groups"
 export TENANTID_AZURERBAC_AKS_BASELINE=$(az account show --query tenantId -o tsv)
 
 # the following statement has been commented as this deployment assumes the use of one Azure AD tenant for integration and RBAC 
