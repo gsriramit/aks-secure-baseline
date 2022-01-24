@@ -33,5 +33,5 @@ jobs:
       uses: Azure/cli@v1.0.0
       with:
         inlineScript: |
-          chmod +x $GITHUB_WORKSPACE/automationsscripts/setup-prerequisites.sh
-          $GITHUB_WORKSPACE/automationsscripts/setup-prerequisites.sh
+          chmod +x $GITHUB_WORKSPACE/automationscripts/setup-prerequisites.sh
+          $GITHUB_WORKSPACE/automationscripts/setup-prerequisites.sh
