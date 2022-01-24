@@ -6,7 +6,7 @@
 # Create an Azure Service Principal - this statement should be run from the azure bash shell or the Ubuntu WSL and the output JSON needs to be saved to the GitHub secrets called "Azure_Credentials"
 # az ad sp create-for-rbac --name "github-workflow-aks-cluster" --skip-assignment
 # replace the value of the --id parameter in the following command with the objectId of the newly created service principal
-export APP_ID= $(az ad sp show --id a2855bef-2150-4983-8b1b-6d6d2bcc52f0 --query appId -o tsv)
+export APP_ID=$(az ad sp show --id a2855bef-2150-4983-8b1b-6d6d2bcc52f0 --query appId -o tsv)
 
 # Wait for propagation
 until az ad sp show --id ${APP_ID} &> /dev/null ; do echo "Waiting for Azure AD propagation" && sleep 5; done
