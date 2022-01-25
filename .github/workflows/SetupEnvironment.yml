@@ -12,6 +12,14 @@ on:
   workflow_dispatch:
     branches: [ main ]
 
+env:
+  HUB_RG_LOCATION: centralus
+  SPOKE_RG_LOCATION: centralus
+  RESOURCE_LOCATION : eastus2
+  HUB_RG_NAME: rg-enterprise-networking-hubs
+  SPOKE_RG_NAME: rg-enterprise-networking-spokes
+
+
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   deploy:
@@ -27,11 +35,20 @@ jobs:
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    # Deploy the cluster into your environment, assuming all prerequisites are up and running.
-    - name: Azure CLI - Deploy AKS cluster
+    # Create the necessary Prerequisites
+    - name: Azure CLI - Create AAD and RBAC Permissions 
       id: aks-cluster
       uses: Azure/cli@v1.0.0
       with:
         inlineScript: |
           chmod +x $GITHUB_WORKSPACE/automationscripts/setup-prerequisites.sh
           $GITHUB_WORKSPACE/automationscripts/setup-prerequisites.sh
+
+    # Create the base networking setup
+    - name: Azure CLI - Create the Base Networking setup for the AKS deployment
+      uses: Azure/cli@v1.0.0
+      with:
+        inlineScript: |
+          chmod +x $GITHUB_WORKSPACE/automationscripts/deployBaseNetwork.sh
+          $GITHUB_WORKSPACE/automationscripts/deployBaseNetwork.sh ${{ env.HUB_RG_LOCATION }} ${{ env.SPOKE_RG_LOCATION}} ${{ env.RESOURCE_LOCATION }} ${{env.HUB_RG_NAME}} ${{env.SPOKE_RG_NAME}}
+

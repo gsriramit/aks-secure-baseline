@@ -1,24 +1,5 @@
 #!/bin/bash
 
-# Step 1.1
-# Create the Service Principal that will be used to trigger the workflows and assign it the appropriate AAD and Azure RBAC roles
-
-# Create an Azure Service Principal - this statement should be run from the azure bash shell or the Ubuntu WSL and the output JSON needs to be saved to the GitHub secrets called "Azure_Credentials"
-# az ad sp create-for-rbac --name "github-workflow-aks-cluster" --skip-assignment
-# replace the value of the --id parameter in the following command with the objectId of the newly created service principal
-export APP_ID=$(az ad sp show --id a2855bef-2150-4983-8b1b-6d6d2bcc52f0 --query appId -o tsv)
-
-# Wait for propagation
-until az ad sp show --id ${APP_ID} &> /dev/null ; do echo "Waiting for Azure AD propagation" && sleep 5; done
-
-# Assign built-in Contributor RBAC role for creating resource groups and performing deployments at subscription level
-az role assignment create --assignee $APP_ID --role 'Contributor'
-
-# Assign built-in User Access Administrator RBAC role since granting RBAC access to other resources during the cluster creation will be required at subscription level (e.g. AKS-managed Internal Load Balancer, ACR, Managed Identities, etc.)
-az role assignment create --assignee $APP_ID --role 'User Access Administrator'
-
-echo "Completed assigning the necessary permissions to the SP"
-
 # Step 1.2
 # Register the preview features for the target subscription
 az feature register --namespace "Microsoft.ContainerService" -n "AKS-AzureKeyVaultSecretsProvider"
@@ -40,8 +21,6 @@ echo "Completed registering the necessary features"
 # execute the following commands from the context of the root folder
 echo "Creating the TLS certificates"
 
-cd ..
-echo $(pwd)
 export DOMAIN_NAME_AKS_BASELINE="contoso.com"
 
 openssl req -x509 -nodes -days 365 -newkey rsa:2048 -out appgw.crt -keyout appgw.key -subj "/CN=bicycle.${DOMAIN_NAME_AKS_BASELINE}/O=Contoso Bicycle" -addext "subjectAltName = DNS:bicycle.${DOMAIN_NAME_AKS_BASELINE}" -addext "keyUsage = digitalSignature" -addext "extendedKeyUsage = serverAuth"
@@ -49,9 +28,13 @@ openssl pkcs12 -export -out appgw.pfx -in appgw.crt -inkey appgw.key -passout pa
 
 export APP_GATEWAY_LISTENER_CERTIFICATE_AKS_BASELINE=$(cat appgw.pfx | base64 | tr -d '\n')
 
+echo $APP_GATEWAY_LISTENER_CERTIFICATE_AKS_BASELINE
+
 openssl req -x509 -nodes -days 365 -newkey rsa:2048 -out traefik-ingress-internal-aks-ingress-tls.crt -keyout traefik-ingress-internal-aks-ingress-tls.key -subj "/CN=*.aks-ingress.${DOMAIN_NAME_AKS_BASELINE}/O=Contoso AKS Ingress"
 
 export AKS_INGRESS_CONTROLLER_CERTIFICATE_BASE64_AKS_BASELINE=$(cat traefik-ingress-internal-aks-ingress-tls.crt | base64 | tr -d '\n')
+
+echo $AKS_INGRESS_CONTROLLER_CERTIFICATE_BASE64_AKS_BASELINE
 
 echo "Completed Creating & Exporting the TLS certificates"
 
