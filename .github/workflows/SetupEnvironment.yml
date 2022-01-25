@@ -11,9 +11,6 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-env:
-  TENANT_ID: ${{secrets.TentantId}}
-
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   deploy:
@@ -22,11 +19,18 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
-     
-    - name: Azure User Login
+
+    # Login into your Azure Subscription using your Azure credentials - make sure the credentials has write permissions for the specific resource group/subscription. The credentials should be stored in GitHub Secrets - (Go to Settings Tab ->Secrets)
+    - name: Azure Login
+      uses: Azure/login@v1.1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    # Deploy the cluster into your environment, assuming all prerequisites are up and running.
+    - name: Azure CLI - Deploy AKS cluster
+      id: aks-cluster
       uses: Azure/cli@v1.0.0
       with:
         inlineScript: |
-          az login --tenant env.TENANT_ID
-
-
+          chmod +x $GITHUB_WORKSPACE/automationscripts/setup-prerequisites.sh
+          $GITHUB_WORKSPACE/automationscripts/setup-prerequisites.sh
