@@ -57,7 +57,7 @@ jobs:
 
     # Create the necessary Prerequisites
     - name: Azure CLI - Integtation with AAD - Create K8s specific groups and users
-      id: aks-tls
+      id: aks-aad-integration
       uses: Azure/cli@v1.0.0
       with:
         inlineScript: |
