@@ -73,7 +73,7 @@ jobs:
          az deployment group create -g rg-bu0001a0008 -f cluster-stamp.json -p "@azuredeploy.parameters.prod.json"
 
           echo "::set-output name=name::$(az deployment group show --resource-group ${{ env.RESOURCE_GROUP }} -n cluster-stamp --query properties.outputs.aksClusterName.value -o tsv)"
-        azcliversion: 2.17.1
+        
 
     # Set the AKS cluster context
     - name: Set the AKS cluster context

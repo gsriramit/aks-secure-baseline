@@ -17,8 +17,8 @@ env:
   RESOURCE_LOCATION : 'eastus2'
   HUB_RG_NAME: 'rg-enterprise-networking-hubs'
   SPOKE_RG_NAME: 'rg-enterprise-networking-spokes'
-  DEPLOY_TLS_CERTS: false
-  DEPLOY_BASE_NETWORK: false
+  DEPLOY_TLS_CERTS: 'false'
+  DEPLOY_BASE_NETWORK: 'false'
 
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
@@ -49,7 +49,7 @@ jobs:
     - name: Azure CLI - Create TLS Certificates
       id: aks-tls
       uses: Azure/cli@v1.0.0
-      if: ${{ env.DEPLOY_TLS_CERTS }} == true
+      if: ${{ env.DEPLOY_TLS_CERTS }} == 'true'
       with:
         inlineScript: |
           chmod +x $GITHUB_WORKSPACE/automationscripts/createTLSCertificates.sh
@@ -68,7 +68,7 @@ jobs:
     # Create the base networking setup
     - name: Azure CLI - Create the Base Networking setup for the AKS deployment
       uses: Azure/cli@v1.0.0
-      if: ${{ env.DEPLOY_BASE_NETWORK }} == true
+      if: ${{ env.DEPLOY_BASE_NETWORK }} == 'true'
       with:
         inlineScript: |
           chmod +x $GITHUB_WORKSPACE/automationscripts/deployBaseNetwork.sh
