@@ -12,11 +12,13 @@ on:
   workflow_dispatch:
 
 env:
-  HUB_RG_LOCATION: centralus
-  SPOKE_RG_LOCATION: centralus
-  RESOURCE_LOCATION : eastus2
-  HUB_RG_NAME: rg-enterprise-networking-hubs
-  SPOKE_RG_NAME: rg-enterprise-networking-spokes
+  HUB_RG_LOCATION: 'centralus'
+  SPOKE_RG_LOCATION: 'centralus'
+  RESOURCE_LOCATION : 'eastus2'
+  HUB_RG_NAME: 'rg-enterprise-networking-hubs'
+  SPOKE_RG_NAME: 'rg-enterprise-networking-spokes'
+  DEPLOY_TLS_CERTS: false
+  DEPLOY_BASE_NETWORK: false
 
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
@@ -35,17 +37,38 @@ jobs:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
     # Create the necessary Prerequisites
-    - name: Azure CLI - Create AAD and RBAC Permissions 
-      id: aks-cluster
+    - name: Azure CLI - Subscription Prerequisites
+      id: aks-subscription
       uses: Azure/cli@v1.0.0
       with:
         inlineScript: |
-          chmod +x $GITHUB_WORKSPACE/automationscripts/setup-prerequisites.sh
-          $GITHUB_WORKSPACE/automationscripts/setup-prerequisites.sh
+          chmod +x $GITHUB_WORKSPACE/automationscripts/registerSubscriptionRequisites.sh
+          $GITHUB_WORKSPACE/automationscripts/registerSubscriptionRequisites.sh
+
+    # Create the necessary Prerequisites
+    - name: Azure CLI - Create TLS Certificates
+      id: aks-tls
+      uses: Azure/cli@v1.0.0
+      if: ${{ env.DEPLOY_TLS_CERTS }} == true
+      with:
+        inlineScript: |
+          chmod +x $GITHUB_WORKSPACE/automationscripts/createTLSCertificates.sh
+          $GITHUB_WORKSPACE/automationscripts/createTLSCertificates.sh
+
+    # Create the necessary Prerequisites
+    - name: Azure CLI - Integtation with AAD - Create K8s specific groups and users
+      id: aks-tls
+      uses: Azure/cli@v1.0.0
+      with:
+        inlineScript: |
+          chmod +x $GITHUB_WORKSPACE/automationscripts/createK8sAADGroupsNUsers.sh
+          $GITHUB_WORKSPACE/automationscripts/createK8sAADGroupsNUsers.sh
+
 
     # Create the base networking setup
     - name: Azure CLI - Create the Base Networking setup for the AKS deployment
       uses: Azure/cli@v1.0.0
+      if: ${{ env.DEPLOY_BASE_NETWORK }} == true
       with:
         inlineScript: |
           chmod +x $GITHUB_WORKSPACE/automationscripts/deployBaseNetwork.sh
