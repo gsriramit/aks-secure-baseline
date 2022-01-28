@@ -9,7 +9,7 @@
       "value": "centralus"
     },
     "targetVnetResourceId": {
-      "value": "/subscriptions/[]/resourceGroups/rg-enterprise-networking-spokes/providers/Microsoft.Network/virtualNetworks/vnet-spoke-BU0001A0008-00"
+      "value": ""
     },
     "clusterAdminAadGroupObjectId": {
       "value": ""

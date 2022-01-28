@@ -3,6 +3,8 @@
 # Step 3
 # This step is supposed to take care of the integration of the AKS with Azure AD
 
+apt install jq
+
 echo "Assigning members to the AAD groups"
 export TENANTID_AZURERBAC_AKS_BASELINE=$(az account show --query tenantId -o tsv)
 
@@ -25,3 +27,13 @@ az ad group member add -g $AADOBJECTID_GROUP_CLUSTERADMIN_AKS_BASELINE --member-
 
 # Create/identify the Azure AD security group that is going to be a namespace reader.
 export AADOBJECTID_GROUP_A0008_READER_AKS_BASELINE=$(az ad group create --display-name 'cluster-ns-a0008-readers-bu0001a000800' --mail-nickname 'cluster-ns-a0008-readers-bu0001a000800' --description "Principals in this group are readers of namespace a0008 in the bu0001a000800 cluster." --force false --query objectId -o tsv)
+
+
+#Update the objectId values in the prod config
+
+echo "Updating Authorization Tenant-Id in the prod config"
+echo $(cat azuredeploy.parameters.prod.json | jq --arg authz_tenant_Id "$TENANTID_K8SRBAC_AKS_BASELINE" '.parameters.k8sControlPlaneAuthorizationTenantId.value|=$authz_tenant_Id') > azuredeploy.parameters.prod.json
+echo "Updating CLusterAdminGroup-Object-Id in the prod config"
+echo $(cat azuredeploy.parameters.prod.json | jq --arg cluster_admin_objectId "$AADOBJECTID_GROUP_CLUSTERADMIN_AKS_BASELINE" '.parameters.clusterAdminAadGroupObjectId.value|=$cluster_admin_objectId') > azuredeploy.parameters.prod.json
+echo "Updating NamespacereaderGroup-Object-Id in the prod config"
+echo $(cat azuredeploy.parameters.prod.json | jq --arg namespace_reader_objectId "$AADOBJECTID_GROUP_A0008_READER_AKS_BASELINE" '.parameters.a0008NamespaceReaderAadGroupObjectId.value|=$namespace_reader_objectId') > azuredeploy.parameters.prod.json

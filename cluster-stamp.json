@@ -7,7 +7,8 @@
             "minLength": 79,
             "metadata": {
                 "description": "The regional network spoke VNet Resource ID that the cluster will be joined to"
-            }
+            },
+            "defaultValue":"[concat(resourceGroup().id,'/providers/Microsoft.Network/virtualNetworks/vnet-spoke-BU0001A0008-00')]"
         },
         "clusterAdminAadGroupObjectId": {
             "type": "string",

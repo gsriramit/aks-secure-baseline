@@ -17,8 +17,13 @@ env:
   RESOURCE_LOCATION : 'eastus2'
   HUB_RG_NAME: 'rg-enterprise-networking-hubs'
   SPOKE_RG_NAME: 'rg-enterprise-networking-spokes'
-  DEPLOY_TLS_CERTS: 'false'
+  DEPLOY_TLS_CERTS: 'true'
   DEPLOY_BASE_NETWORK: 'false'
+  RESOURCE_GROUP_LOCATION: 'eastus2'  # The location where the resource group is going to be created
+  RESOURCE_GROUP: 'rg-bu0001a0008'    # The name for the AKS cluster resource group
+  TENANT_ID: ${{ secrets.AZURE_CREDENTIALS.tenantId}}
+  SP_OBJECT_ID: ${{ secrets.spObjectId}}
+
 
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
@@ -49,11 +54,25 @@ jobs:
     - name: Azure CLI - Create TLS Certificates
       id: aks-tls
       uses: Azure/cli@v1.0.0
-      if: ${{ env.DEPLOY_TLS_CERTS }} == 'true'
+      if: ${{ env.DEPLOY_TLS_CERTS == 'true' }}
       with:
         inlineScript: |
           chmod +x $GITHUB_WORKSPACE/automationscripts/createTLSCertificates.sh
           $GITHUB_WORKSPACE/automationscripts/createTLSCertificates.sh
+
+    # The following step(s) can be used if the creation of the prereq and the deployment of the cluster are executed as separate jobs
+    # The certificates created during the prereq step can be uploaded as artifacts and made available to the subsequent job
+    # - name: Upload Certificates files as artifacts to be used in the next job
+    #   uses: actions/upload-artifact@v2
+    #   with:
+    #     name: uploadresscertificate
+    #     path: traefik-ingress-internal-aks-ingress-tls.*
+
+    # - name: Upload Certificates files as artifacts to be used in the next job
+    #   uses: actions/upload-artifact@v2
+    #   with:
+    #     name: uploadApplicationGatewayCertificate
+    #     path: traefik-ingress-internal-aks-ingress-tls.*
 
     # Create the necessary Prerequisites
     - name: Azure CLI - Integtation with AAD - Create K8s specific groups and users
@@ -68,9 +87,27 @@ jobs:
     # Create the base networking setup
     - name: Azure CLI - Create the Base Networking setup for the AKS deployment
       uses: Azure/cli@v1.0.0
-      if: ${{ env.DEPLOY_BASE_NETWORK }} == 'true'
+      if: ${{ env.DEPLOY_BASE_NETWORK == 'true' }}
       with:
         inlineScript: |
           chmod +x $GITHUB_WORKSPACE/automationscripts/deployBaseNetwork.sh
           $GITHUB_WORKSPACE/automationscripts/deployBaseNetwork.sh ${{ env.HUB_RG_LOCATION }} ${{ env.SPOKE_RG_LOCATION}} ${{ env.RESOURCE_LOCATION }} ${{env.HUB_RG_NAME}} ${{env.SPOKE_RG_NAME}}
 
+    # Deploy the cluster into your environment, assuming all prerequisites are up and running.
+    - name: Azure CLI - Deploy AKS cluster
+      id: aks-cluster
+      uses: Azure/cli@v1.0.0
+      with:
+        inlineScript: |
+         az group create --name ${{ env.RESOURCE_GROUP }} --location ${{ env.RESOURCE_GROUP_LOCATION }}
+         az deployment group create -g ${{ env.RESOURCE_GROUP }} -f cluster-stamp.json -p "@azuredeploy.parameters.prod.json"
+
+          echo "::set-output name=name::$(az deployment group show --resource-group ${{ env.RESOURCE_GROUP }} -n cluster-stamp --query properties.outputs.aksClusterName.value -o tsv)"
+
+     # Create the base networking setup
+    - name: Azure CLI - keyvault/PodIdentity/ACR-Image-Import/Ingress&Workload Deployment
+      uses: Azure/cli@v1.0.0
+      with:
+        inlineScript: |
+          chmod +x $GITHUB_WORKSPACE/automationscripts/postClusterDeployment.sh
+          $GITHUB_WORKSPACE/automationscripts/postClusterDeployment.sh ${{ env.RESOURCE_GROUP }} ${{env.SPOKE_RG_NAME}} ${{env.TENANT_ID}} ${{env.SP_OBJECT_ID}}
