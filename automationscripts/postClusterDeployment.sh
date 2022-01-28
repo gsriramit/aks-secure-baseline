@@ -17,6 +17,8 @@ APPGW_PUBLIC_IP=$(az deployment group show -g $RGNAMESPOKES -n spoke-0001 --quer
 
 # Create the keyvault access policy that lets the SP import the ingress controller certificate into the vault
 az keyvault set-policy --certificate-permissions import get -n $KEYVAULT_NAME --object-id $SP_OBJECTID
+# Use the Azure RBAC assignment instead of the keyvault access policies?
+# TEMP_ROLEASSIGNMENT_TO_UPLOAD_CERT=$(az role assignment create --role a4417e6f-fecd-4de8-b567-7b0420556985 --assignee-principal-type user --assignee-object-id $(az ad signed-in-user show --query 'objectId' -o tsv) --scope $(az keyvault show --name $KEYVAULT_NAME_AKS_BASELINE --query 'id' -o tsv) --query 'id' -o tsv)
 
 # Create the .pem file from the crt and key files and import into keyvault
 cat traefik-ingress-internal-aks-ingress-tls.crt traefik-ingress-internal-aks-ingress-tls.key > traefik-ingress-internal-aks-ingress-tls.pem
@@ -45,9 +47,9 @@ echo ""
 # unset errexit as per https://github.com/mspnp/aks-secure-baseline/issues/69
 set +e
 echo $'Ensure Flux has created the following namespace and then press Ctrl-C'
-kubectl get ns a0008 --watch
+# kubectl get ns a0008 --watch
 
-
+echo "Creating the Identity and Binding for the Ingress Controller Pods"
 cat <<EOF | kubectl apply -f -
 apiVersion: "aadpodidentity.k8s.io/v1"
 kind: AzureIdentity
@@ -105,4 +107,4 @@ kubectl wait --namespace a0008 \
   --selector=app.kubernetes.io/name=aspnetapp \
   --timeout=90s
 echo 'you must see the EXTERNAL-IP 10.240.4.4, please wait till it is ready. It takes a some minutes, then cntr+c'
-kubectl get svc -n traefik --watch  -n a0008
+echo $(kubectl get svc -n traefik --watch  -n a0008)
