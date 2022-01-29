@@ -24,4 +24,4 @@ jobs:
       - name: Run a multi-line script
         if: ${{ env.EXECUTE_STEP == 'true'}}
         run: |
-          apt install jq
+          echo '{"fruit":{"name":"apple","color":"green","price":1.20}}' | jq '.'
