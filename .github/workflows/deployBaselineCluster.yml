@@ -93,6 +93,7 @@ jobs:
           chmod +x $GITHUB_WORKSPACE/automationscripts/deployBaseNetwork.sh
           $GITHUB_WORKSPACE/automationscripts/deployBaseNetwork.sh ${{ env.HUB_RG_LOCATION }} ${{ env.SPOKE_RG_LOCATION}} ${{ env.RESOURCE_LOCATION }} ${{env.HUB_RG_NAME}} ${{env.SPOKE_RG_NAME}}
 
+
     # Deploy the cluster into your environment, assuming all prerequisites are up and running.
     - name: Azure CLI - Deploy AKS cluster
       id: aks-cluster

@@ -26,3 +26,7 @@ RESOURCEID_SUBNET_NODEPOOLS=$(az deployment group show -g $spoke_rg_name -n spok
 
 # Update the shared, regional hub deployment to account for the requirements of the spoke.
 az deployment group create -g $hub_rg_name -f networking/hub-regionA.json -p location=$resource_location nodepoolSubnetResourceIds="['${RESOURCEID_SUBNET_NODEPOOLS}']"
+
+# Update the spoke networkId in the prod deployment config file
+spokeVnetId=$(az network vnet show -g spoke_rg_name -n vnet-spoke-BU0001A0008-00 --query id -o tsv)
+echo $(cat azuredeploy.parameters.prod.json | jq --arg tagetVnetId "$spokeVnetId" '.parameters.targetVnetResourceId.value|=$tagetVnetId') > azuredeploy.parameters.prod.json
