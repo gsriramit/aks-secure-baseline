@@ -3,8 +3,6 @@
 # Step 3
 # This step is supposed to take care of the integration of the AKS with Azure AD
 
-apt install jq
-
 echo "Assigning members to the AAD groups"
 export TENANTID_AZURERBAC_AKS_BASELINE=$(az account show --query tenantId -o tsv)
 
