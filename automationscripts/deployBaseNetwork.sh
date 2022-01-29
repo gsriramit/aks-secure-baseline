@@ -29,7 +29,7 @@ az deployment group create -g $hub_rg_name -f networking/hub-regionA.json -p loc
 
 # Update the spoke networkId in the prod deployment config file
 echo "updating the resource-id of the spoke virtual network to which the cluster would be mapped"
-spokeVnetId=$(az network vnet show -g spoke_rg_name -n vnet-spoke-BU0001A0008-00 --query id -o tsv)
+spokeVnetId=$(az network vnet show -g $spoke_rg_name -n vnet-spoke-BU0001A0008-00 --query id -o tsv)
 echo $(cat azuredeploy.parameters.prod.json | jq --arg tagetVnetId "$spokeVnetId" '.parameters.targetVnetResourceId.value|=$tagetVnetId') > azuredeploy.parameters.prod.json
 
 # Prod params after the upate of the targetVnetId
