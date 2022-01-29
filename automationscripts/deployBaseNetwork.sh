@@ -14,18 +14,18 @@ az group create -n $hub_rg_name -l $hub_rg_location
 az group create -n $spoke_rg_name -l $spoke_rg_location
 
 # Create the regional network hub.
-az deployment group create -g $hub_rg_name -f networking/hub-default.json -p location=$resource_location
+az deployment group create -g $hub_rg_name -f networking/hub-default.json -p location=$resource_location  --mode Incremental
 
 RESOURCEID_VNET_HUB=$(az deployment group show -g $hub_rg_name -n hub-default --query properties.outputs.hubVnetId.value -o tsv)
 
 #Create the spoke that will be home to the AKS cluster and its adjacent resources.
-az deployment group create -g $spoke_rg_name -f networking/spoke-BU0001A0008.json -p location=$resource_location hubVnetResourceId="${RESOURCEID_VNET_HUB}"
+az deployment group create -g $spoke_rg_name -f networking/spoke-BU0001A0008.json -p location=$resource_location hubVnetResourceId="${RESOURCEID_VNET_HUB}" --mode Incremental
 
 
 RESOURCEID_SUBNET_NODEPOOLS=$(az deployment group show -g $spoke_rg_name -n spoke-BU0001A0008 --query properties.outputs.nodepoolSubnetResourceIds.value -o tsv)
 
 # Update the shared, regional hub deployment to account for the requirements of the spoke.
-az deployment group create -g $hub_rg_name -f networking/hub-regionA.json -p location=$resource_location nodepoolSubnetResourceIds="['${RESOURCEID_SUBNET_NODEPOOLS}']"
+az deployment group create -g $hub_rg_name -f networking/hub-regionA.json -p location=$resource_location nodepoolSubnetResourceIds="['${RESOURCEID_SUBNET_NODEPOOLS}']" --mode Incremental
 
 # Update the spoke networkId in the prod deployment config file
 echo "updating the resource-id of the spoke virtual network to which the cluster would be mapped"
