@@ -37,3 +37,6 @@ echo "Updating CLusterAdminGroup-Object-Id in the prod config"
 echo $(cat azuredeploy.parameters.prod.json | jq --arg cluster_admin_objectId "$AADOBJECTID_GROUP_CLUSTERADMIN_AKS_BASELINE" '.parameters.clusterAdminAadGroupObjectId.value|=$cluster_admin_objectId') > azuredeploy.parameters.prod.json
 echo "Updating NamespacereaderGroup-Object-Id in the prod config"
 echo $(cat azuredeploy.parameters.prod.json | jq --arg namespace_reader_objectId "$AADOBJECTID_GROUP_A0008_READER_AKS_BASELINE" '.parameters.a0008NamespaceReaderAadGroupObjectId.value|=$namespace_reader_objectId') > azuredeploy.parameters.prod.json
+
+# Completed updating the parameters file with the necessary config
+echo $(cat azuredeploy.parameters.prod.json)

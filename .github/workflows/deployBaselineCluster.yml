@@ -1,4 +1,4 @@
-name: AKS Deployment Environment Setup
+name: AKS Baseline Cluster  Deployment Setup
 
 # Controls when the workflow will run
 on: 
