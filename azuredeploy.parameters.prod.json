@@ -8,9 +8,6 @@
     "geoRedundancyLocation": {
       "value": "centralus"
     },
-    "targetVnetResourceId": {
-      "value": ""
-    },
     "clusterAdminAadGroupObjectId": {
       "value": ""
     },
