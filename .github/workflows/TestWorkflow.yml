@@ -9,7 +9,7 @@ on:
 env:
   EXECUTE_STEP: 'true'
   TENANT_ID: ${{ secrets.AZURE_CREDENTIALS.tenantId}}
-  SP_OBJECT_ID: ${{ secrets.SPOBJECTID}}
+  SP_OBJECT_ID: 'a2855bef-2150-4983-8b1b-6d6d2bcc52f0' #${{ secrets.SPOBJECTID}}
   HUB_RG_LOCATION: 'centralus'
   SPOKE_RG_LOCATION: 'centralus'
   RESOURCE_LOCATION : 'eastus2'
@@ -40,7 +40,7 @@ jobs:
         run: |
           echo "Tenant Id: $TENANT_ID"
           echo "SP Object ID: $SP_OBJECT_ID"
-          
+
       # Execute the post-deployment ops
       - name: Azure CLI - keyvault/PodIdentity/ACR-Image-Import/Ingress&Workload Deployment
         uses: Azure/cli@v1.0.0
