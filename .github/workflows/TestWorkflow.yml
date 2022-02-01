@@ -38,8 +38,10 @@ jobs:
       - name: Run a multi-line script
         if: ${{ env.EXECUTE_STEP == 'true'}}
         run: |
-          echo "Tenant Id: ${{#env.TENANT_ID}}"
-          echo "SP Object ID: ${{#env.SP_OBJECT_ID}}"
+          Tenant_Id = ${{env.TENANT_ID}}
+          SP_Id = ${{env.SP_OBJECT_ID}}
+          echo "Tenant Id length: ${#Tenant_Id} "
+          echo "SP Object ID length: ${#SP_Id}"
 
       # Execute the post-deployment ops
       - name: Azure CLI - keyvault/PodIdentity/ACR-Image-Import/Ingress&Workload Deployment
