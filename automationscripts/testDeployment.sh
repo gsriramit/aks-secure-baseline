@@ -4,7 +4,7 @@
 RGNAMECLUSTER=$1
 RGNAMESPOKES=$2
 TENANT_ID=$3
-SP_OBJECTID= $4
+SP_OBJECTID=$4
 
 echo "Current working directory: $(pwd)"
 echo "Value of Tenant Id:  $TENANT_ID"

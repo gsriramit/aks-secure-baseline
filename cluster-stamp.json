@@ -2139,6 +2139,10 @@
         "containerRegistryName": {
             "type": "string",
             "value": "[variables('defaultAcrName')]"
+        },
+        "appGwPublicIpAddress": {
+            "type": "string",
+            "value": "[resourceId(subscription().subscriptionId, variables('vNetResourceGroup'), 'Microsoft.Network/publicIpAddresses', 'pip-BU0001A0008-00')]"
         }
     }
 }

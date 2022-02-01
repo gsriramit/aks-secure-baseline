@@ -37,7 +37,7 @@ echo "kubectl version is $(kubectl version --client)"
 
 # Create the cluster baseline namespace and apply the flux config
 kubectl create namespace cluster-baseline-settings
-kubectl apply -f ../cluster-manifests/cluster-baseline-settings/flux.yaml
+kubectl apply -f cluster-manifests/cluster-baseline-settings/flux.yaml
 kubectl wait --namespace cluster-baseline-settings --for=condition=ready pod --selector=app.kubernetes.io/name=flux --timeout=90s
 kubectl create namespace a0008
 
@@ -103,8 +103,8 @@ EOF
 
 
 # Deploy the ingress controller and the actual workload deployments
-kubectl apply -f ../workload/traefik.yaml
-kubectl apply -f ../workload/aspnetapp.yaml
+kubectl apply -f workload/traefik.yaml
+kubectl apply -f workload/aspnetapp.yaml
 
 
 echo 'the ASPNET Core webapp sample is all setup. Wait until is ready to process requests running'
