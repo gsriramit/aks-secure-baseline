@@ -107,7 +107,7 @@ jobs:
 
           echo "::set-output name=name::$(az deployment group show --resource-group ${{ env.RESOURCE_GROUP }} -n cluster-stamp --query properties.outputs.aksClusterName.value -o tsv)"
 
-     # Create the base networking setup
+     # Execute the post-deployment ops
     - name: Azure CLI - keyvault/PodIdentity/ACR-Image-Import/Ingress&Workload Deployment
       uses: Azure/cli@v1.0.0
       with:

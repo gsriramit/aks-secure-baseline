@@ -7,7 +7,21 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 env:
-  EXECUTE_STEP: 'false'
+  EXECUTE_STEP: 'true'
+  TENANT_ID: ${{ secrets.AZURE_CREDENTIALS.tenantId}}
+  SP_OBJECT_ID: ${{ secrets.SPOBJECTID}}
+  HUB_RG_LOCATION: 'centralus'
+  SPOKE_RG_LOCATION: 'centralus'
+  RESOURCE_LOCATION : 'eastus2'
+  HUB_RG_NAME: 'rg-enterprise-networking-hubs'
+  SPOKE_RG_NAME: 'rg-enterprise-networking-spokes'
+  DEPLOY_TLS_CERTS: 'true'
+  DEPLOY_BASE_NETWORK: 'false'
+  DEPLOY_AKS_CLUSTER: 'false'
+  RESOURCE_GROUP_LOCATION: 'eastus2'  # The location where the resource group is going to be created
+  RESOURCE_GROUP: 'rg-bu0001a0008'    # The name for the AKS cluster resource group
+
+
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
@@ -24,12 +38,13 @@ jobs:
       - name: Run a multi-line script
         if: ${{ env.EXECUTE_STEP == 'true'}}
         run: |
-          echo '{"fruit":{"name":"apple","color":"green","price":1.20}}' | jq '.'
-
-      - name: Azure CLI - Deploy AKS cluster
-        id: aks-cluster-cli
+          echo "Tenant Id: $TENANT_ID"
+          echo "SP Object ID: $SP_OBJECT_ID"
+          
+      # Execute the post-deployment ops
+      - name: Azure CLI - keyvault/PodIdentity/ACR-Image-Import/Ingress&Workload Deployment
         uses: Azure/cli@v1.0.0
         with:
-          inlineScript: |
-            az aks install-cli
-             echo $(kubectl version --client)
+         inlineScript: |
+          chmod +x $GITHUB_WORKSPACE/automationscripts/testDeployment.sh
+          $GITHUB_WORKSPACE/automationscripts/testDeployment.sh ${{ env.RESOURCE_GROUP }} ${{env.SPOKE_RG_NAME}} ${{env.TENANT_ID}} ${{env.SP_OBJECT_ID}}
