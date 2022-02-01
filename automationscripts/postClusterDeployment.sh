@@ -41,6 +41,12 @@ kubectl apply -f cluster-manifests/cluster-baseline-settings/flux.yaml
 kubectl wait --namespace cluster-baseline-settings --for=condition=ready pod --selector=app.kubernetes.io/name=flux --timeout=90s
 kubectl create namespace a0008
 
+#Apply the aad-pod-identity manifests- Without this being applied the following errors are thrown
+#unable to recognize "STDIN": no matches for kind "AzureIdentity" in version "aadpodidentity.k8s.io/v1"
+#unable to recognize "STDIN": no matches for kind "AzureIdentityBinding" in version "aadpodidentity.k8s.io/v1"
+#ToDo- the AzureManagedIdentity feature added to the subscription should have installed these CRDs? No?
+kubectl apply -f cluster-manifests/cluster-baseline-settings/aad-pod-identity.yaml
+
 ACR_NAME=$(az deployment group show -g $RGNAMECLUSTER -n cluster-stamp --query properties.outputs.containerRegistryName.value -o tsv)
 # Import ingress controller image hosted in public container registries
 az acr import --source docker.io/library/traefik:v2.5.3 -n $ACR_NAME

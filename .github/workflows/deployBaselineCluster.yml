@@ -112,5 +112,7 @@ jobs:
       uses: Azure/cli@v1.0.0
       with:
         inlineScript: |
+          Tenant_Id=${{env.TENANT_ID}}
+          SP_Id=${{env.SP_OBJECT_ID}}
           chmod +x $GITHUB_WORKSPACE/automationscripts/postClusterDeployment.sh
-          $GITHUB_WORKSPACE/automationscripts/postClusterDeployment.sh ${{ env.RESOURCE_GROUP }} ${{env.SPOKE_RG_NAME}} ${{env.TENANT_ID}} ${{env.SP_OBJECT_ID}}
+          $GITHUB_WORKSPACE/automationscripts/postClusterDeployment.sh ${{ env.RESOURCE_GROUP }} ${{env.SPOKE_RG_NAME}} $Tenant_Id $SP_Id
