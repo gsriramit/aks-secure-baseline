@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 env:
   EXECUTE_STEP: 'true'
-  TENANT_ID: ${{ secrets.AZURE_CREDENTIALS.tenantId}}
+  TENANT_ID: ${{ secrets.TENANT_ID}}
   SP_OBJECT_ID: ${{ secrets.SPOBJECTID}} #'a2855bef-2150-4983-8b1b-6d6d2bcc52f0'
   HUB_RG_LOCATION: 'centralus'
   SPOKE_RG_LOCATION: 'centralus'
@@ -48,5 +48,7 @@ jobs:
         uses: Azure/cli@v1.0.0
         with:
          inlineScript: |
+          Tenant_Id=${{env.TENANT_ID}}
+          SP_Id=${{env.SP_OBJECT_ID}}
           chmod +x $GITHUB_WORKSPACE/automationscripts/testDeployment.sh
-          $GITHUB_WORKSPACE/automationscripts/testDeployment.sh ${{ env.RESOURCE_GROUP }} ${{env.SPOKE_RG_NAME}} ${{env.TENANT_ID}} ${{env.SP_OBJECT_ID}}
+          $GITHUB_WORKSPACE/automationscripts/testDeployment.sh ${{ env.RESOURCE_GROUP }} ${{env.SPOKE_RG_NAME}} $Tenant_Id $SP_Id
