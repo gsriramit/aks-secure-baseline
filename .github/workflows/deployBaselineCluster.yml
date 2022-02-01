@@ -18,11 +18,12 @@ env:
   HUB_RG_NAME: 'rg-enterprise-networking-hubs'
   SPOKE_RG_NAME: 'rg-enterprise-networking-spokes'
   DEPLOY_TLS_CERTS: 'true'
-  DEPLOY_BASE_NETWORK: 'true'
+  DEPLOY_BASE_NETWORK: 'false'
+  DEPLOY_AKS_CLUSTER: 'false'
   RESOURCE_GROUP_LOCATION: 'eastus2'  # The location where the resource group is going to be created
   RESOURCE_GROUP: 'rg-bu0001a0008'    # The name for the AKS cluster resource group
   TENANT_ID: ${{ secrets.AZURE_CREDENTIALS.tenantId}}
-  SP_OBJECT_ID: ${{ secrets.spObjectId}}
+  SP_OBJECT_ID: ${{ secrets.SPOBJECTID}}
 
 
 
@@ -98,6 +99,7 @@ jobs:
     - name: Azure CLI - Deploy AKS cluster
       id: aks-cluster
       uses: Azure/cli@v1.0.0
+      if: ${{ env.DEPLOY_AKS_CLUSTER == 'true' }}
       with:
         inlineScript: |
          az group create --name ${{ env.RESOURCE_GROUP }} --location ${{ env.RESOURCE_GROUP_LOCATION }}

@@ -13,7 +13,9 @@ TRAEFIK_USER_ASSIGNED_IDENTITY_RESOURCE_ID=$(az deployment group show -g $RGNAME
 TRAEFIK_USER_ASSIGNED_IDENTITY_CLIENT_ID=$(az deployment group show -g $RGNAMECLUSTER -n cluster-stamp --query properties.outputs.aksIngressControllerPodManagedIdentityClientId.value -o tsv)
 # the common keyvault that will be used for the shared resources (Ingress and AppGw certificates) and the app specific secrets
 KEYVAULT_NAME=$(az deployment group show -g $RGNAMECLUSTER -n cluster-stamp --query properties.outputs.keyVaultName.value -o tsv)
-APPGW_PUBLIC_IP=$(az deployment group show -g $RGNAMESPOKES -n spoke-0001 --query properties.outputs.appGwPublicIpAddress.value -o tsv)
+# the original version of the cluster-stamp.json does not contain an output variable that holds the public IP of the app-gw. Updated code is yet to be tested
+#APPGW_PUBLIC_IP=$(az deployment group show -g $RGNAMESPOKES -n spoke-0001 --query properties.outputs.appGwPublicIpAddress.value -o tsv)
+APPGW_PUBLIC_IP=$(az network public-ip show -g $RGNAMESPOKES -n pip-BU0001A0008-00 --query "ipAddress")
 
 # Create the keyvault access policy that lets the SP import the ingress controller certificate into the vault
 az keyvault set-policy --certificate-permissions import get -n $KEYVAULT_NAME --object-id $SP_OBJECTID
@@ -28,6 +30,10 @@ az keyvault certificate import --vault-name $KEYVAULT_NAME -f traefik-ingress-in
 #Note: this is not the recommended practice, however this is considered as a workaround for the issue stated in this thread
 #https://serverfault.com/questions/963481/how-to-grant-a-service-principal-access-to-aks-api-when-rbac-and-aad-integration
 az aks get-credentials -n ${AKS_CLUSTER_NAME} -g ${RGNAMECLUSTER} --admin
+
+# install the kubectl client in the runner
+az aks install-cli
+echo "kubectl version is $(kubectl version --client)"
 
 # Create the cluster baseline namespace and apply the flux config
 kubectl create namespace cluster-baseline-settings
