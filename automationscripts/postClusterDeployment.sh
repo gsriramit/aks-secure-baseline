@@ -4,7 +4,7 @@
 RGNAMECLUSTER=$1
 RGNAMESPOKES=$2
 TENANT_ID=$3
-SP_OBJECTID=$4
+SP_OBJECTID="a2855bef-2150-4983-8b1b-6d6d2bcc52f0"#$4
 
 # The target cluster to which the resources will be deployed
 AKS_CLUSTER_NAME=$(az deployment group show -g $RGNAMECLUSTER -n cluster-stamp --query properties.outputs.aksClusterName.value -o tsv)
@@ -18,6 +18,8 @@ KEYVAULT_NAME=$(az deployment group show -g $RGNAMECLUSTER -n cluster-stamp --qu
 APPGW_PUBLIC_IP=$(az network public-ip show -g $RGNAMESPOKES -n pip-BU0001A0008-00 --query "ipAddress")
 
 # Create the keyvault access policy that lets the SP import the ingress controller certificate into the vault
+# hard-coding the service principal's objectId - objectId passed as a secret does not seem to work for the following commands
+
 az keyvault set-policy --certificate-permissions import get -n $KEYVAULT_NAME --object-id $SP_OBJECTID
 # Use the Azure RBAC assignment instead of the keyvault access policies?
 TEMP_ROLEASSIGNMENT_TO_UPLOAD_CERT=$(az role assignment create --role a4417e6f-fecd-4de8-b567-7b0420556985 --assignee-principal-type ServicePrincipal --assignee-object-id $SP_OBJECTID --scope $(az keyvault show --name $KEYVAULT_NAME --query 'id' -o tsv) --query 'id' -o tsv)
