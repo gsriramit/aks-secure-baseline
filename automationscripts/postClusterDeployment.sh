@@ -4,7 +4,7 @@
 RGNAMECLUSTER=$1
 RGNAMESPOKES=$2
 TENANT_ID=$3
-SP_OBJECTID= $4
+SP_OBJECTID=$4
 
 # The target cluster to which the resources will be deployed
 AKS_CLUSTER_NAME=$(az deployment group show -g $RGNAMECLUSTER -n cluster-stamp --query properties.outputs.aksClusterName.value -o tsv)
@@ -20,7 +20,7 @@ APPGW_PUBLIC_IP=$(az network public-ip show -g $RGNAMESPOKES -n pip-BU0001A0008-
 # Create the keyvault access policy that lets the SP import the ingress controller certificate into the vault
 az keyvault set-policy --certificate-permissions import get -n $KEYVAULT_NAME --object-id $SP_OBJECTID
 # Use the Azure RBAC assignment instead of the keyvault access policies?
-# TEMP_ROLEASSIGNMENT_TO_UPLOAD_CERT=$(az role assignment create --role a4417e6f-fecd-4de8-b567-7b0420556985 --assignee-principal-type user --assignee-object-id $(az ad signed-in-user show --query 'objectId' -o tsv) --scope $(az keyvault show --name $KEYVAULT_NAME_AKS_BASELINE --query 'id' -o tsv) --query 'id' -o tsv)
+TEMP_ROLEASSIGNMENT_TO_UPLOAD_CERT=$(az role assignment create --role a4417e6f-fecd-4de8-b567-7b0420556985 --assignee-principal-type ServicePrincipal --assignee-object-id $SP_OBJECTID --scope $(az keyvault show --name $KEYVAULT_NAME --query 'id' -o tsv) --query 'id' -o tsv)
 
 # Create the .pem file from the crt and key files and import into keyvault
 cat traefik-ingress-internal-aks-ingress-tls.crt traefik-ingress-internal-aks-ingress-tls.key > traefik-ingress-internal-aks-ingress-tls.pem
@@ -45,6 +45,7 @@ kubectl create namespace a0008
 #unable to recognize "STDIN": no matches for kind "AzureIdentity" in version "aadpodidentity.k8s.io/v1"
 #unable to recognize "STDIN": no matches for kind "AzureIdentityBinding" in version "aadpodidentity.k8s.io/v1"
 #ToDo- the AzureManagedIdentity feature added to the subscription should have installed these CRDs? No?
+#https://github.com/Azure/application-gateway-kubernetes-ingress/issues/116
 kubectl apply -f cluster-manifests/cluster-baseline-settings/aad-pod-identity.yaml
 
 ACR_NAME=$(az deployment group show -g $RGNAMECLUSTER -n cluster-stamp --query properties.outputs.containerRegistryName.value -o tsv)
