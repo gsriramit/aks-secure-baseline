@@ -83,7 +83,7 @@ metadata:
   namespace: a0008
 spec:
   azureIdentity: podmi-ingress-controller-identity
-  selector: podmi-ingress-controller
+  selector: podmi-ingress-controller-identity
 EOF
 
 cat <<EOF | kubectl apply -f -
