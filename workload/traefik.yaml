@@ -188,7 +188,7 @@ metadata:
   labels:
     app.kubernetes.io/name: traefik-ingress-ilb
     app.kubernetes.io/instance: traefik-ingress-ilb
-    aadpodidbinding: podmi-ingress-controller
+    aadpodidbinding: podmi-ingress-controller-identity
 spec:
   replicas: 2
   selector:

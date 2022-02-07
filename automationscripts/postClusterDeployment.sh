@@ -4,7 +4,7 @@
 RGNAMECLUSTER=$1
 RGNAMESPOKES=$2
 TENANT_ID=$3
-SP_OBJECTID="a2855bef-2150-4983-8b1b-6d6d2bcc52f0"#$4
+SP_OBJECTID="a2855bef-2150-4983-8b1b-6d6d2bcc52f0"
 
 # The target cluster to which the resources will be deployed
 AKS_CLUSTER_NAME=$(az deployment group show -g $RGNAMECLUSTER -n cluster-stamp --query properties.outputs.aksClusterName.value -o tsv)
