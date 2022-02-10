@@ -50,6 +50,9 @@ kubectl create namespace a0008
 #https://github.com/Azure/application-gateway-kubernetes-ingress/issues/116
 kubectl apply -f cluster-manifests/cluster-baseline-settings/aad-pod-identity.yaml
 
+# Deploying the aad-pod-identity-exceptions separately as the deployment from the collective CRD fails
+kubectl apply -f cluster-manifests/cluster-baseline-settings/aad-pod-identity-exceptions.yaml
+
 ACR_NAME=$(az deployment group show -g $RGNAMECLUSTER -n cluster-stamp --query properties.outputs.containerRegistryName.value -o tsv)
 # Import ingress controller image hosted in public container registries
 az acr import --source docker.io/library/traefik:v2.5.3 -n $ACR_NAME
