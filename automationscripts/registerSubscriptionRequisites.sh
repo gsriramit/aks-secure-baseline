@@ -12,5 +12,10 @@ az feature list -o table --query "[?name=='Microsoft.ContainerService/AKS-AzureK
 
 # When all say "Registered" then re-register the AKS resource provider (To-Do- check for a subscription that does not have the features registered)
 az provider register --namespace Microsoft.ContainerService
+# references
+# https://github.com/Azure/azure-cli/issues/1910
+# https://github.com/Azure/azure-cli/issues/1528
+# Unsure if the feature has been added. There is no updation to the documentation of "az feature"
+# To-Do: Check for the appropriate command and implement
 
 echo "Completed registering the necessary features"

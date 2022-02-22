@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Step 3
-# This step is supposed to take care of the integration of the AKS with Azure AD
+# This step is supposed to take care of the integration of AKS with Azure AD
 
 echo "Assigning members to the AAD groups"
 export TENANTID_AZURERBAC_AKS_BASELINE=$(az account show --query tenantId -o tsv)
