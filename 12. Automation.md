@@ -13,22 +13,22 @@ The deployment of the baseline architecture has been automated using a bunch of 
 
 ## Github Actions
 Github workflow (deployBaselineCluster.yml) has been coded in the most simple way possible to invoke the scripts in the required order and has been setup to be invoked manually (workflow dispatch). You can change this to any other trigger that might be more suitable for your case.  
-The repo by default provides a Kubernetes specific CD tool (Flux) that will listen for changes to the cluster manifests and trigger a deployment to the cluster automatically. The workflow does not make use of flux for simplicity reasons. You can modify the workflow to start using flux for ** Continuous Deployments ** to the cluster after the first time creation.  
+The repo by default provides a Kubernetes specific CD tool (Flux) that will listen for changes to the cluster manifests and trigger a deployment to the cluster automatically. The workflow does not make use of flux for simplicity reasons. You can modify the workflow to start using flux for **Continuous Deployments** to the cluster after the first time creation.  
 
 ## Steps
-1 Create the SP principal that will be used for the automation
-  - Assign the SP the necessary permissions
-	  - RBAC Role
-		  - Contributor
-		  - User Access Administrator
-		  - Key Vault Certificates Officer
-	    - Azure AD Role
-		  - User Administrator
-2 Create the necessary secrets in GitHub (repository secrets)
-  - AZURE_CREDENTIALS
-	- TENTANTID
-3 Execute the Pre-Deployment script- predeployment.sh (Note that this script needs to be executed manually from the Azure Bash shell or Ubuntu WSL using an account that has the Global Admin Privileges)
-  - Verify that the role assignments (AAD and RBAC) to the SP completed successfully
+1. Create the SP principal that will be used for the automation
+   - Assign the SP the necessary permissions
+     - RBAC Role
+       - Contributor
+       - User Access Administrator
+       - Key Vault Certificates Officer
+     - Azure AD Role
+       - User Administrator  
+2. Create the necessary secrets in GitHub (repository secrets)
+   - AZURE_CREDENTIALS
+   - TENTANTID
+3. Execute the Pre-Deployment script- predeployment.sh (Note that this script needs to be executed manually from the Azure Bash shell or Ubuntu WSL using an account that has the Global Admin Privileges)
+   - Verify that the role assignments (AAD and RBAC) to the SP completed successfully
 4 (optional) - Modify the GitHub actions (deployBaselineCluster.yml) file if needed. The sample provided in this forked repo provides a way to just automate the original implementation to a greater possible extent
 
 
