@@ -20,7 +20,7 @@ Now that you have the [prerequisites](./01-prerequisites.md) met, follow the ste
 
    ```bash
    openssl req -x509 -nodes -days 365 -newkey rsa:2048 -out appgw.crt -keyout appgw.key -subj "/CN=bicycle.${DOMAIN_NAME_AKS_BASELINE}/O=Contoso Bicycle" -addext "subjectAltName = DNS:bicycle.${DOMAIN_NAME_AKS_BASELINE}" -addext "keyUsage = digitalSignature" -addext "extendedKeyUsage = serverAuth"
-   openssl pkcs12 -export -out appgw.pfx -in appgw.crt -inkey appgw.key -passout pass:
+   openssl pkcs12 -export -out appgw.pfx -in appgw.crt -inkey appgw.key -passout pass:appgwtlssecret#12
    ```
 
 1. Base64 encode the client-facing certificate
